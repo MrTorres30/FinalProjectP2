@@ -1,0 +1,8 @@
+## Ignore Visual Studio & .NET build output
+.vs/
+[Bb]in/
+[Oo]bj/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates

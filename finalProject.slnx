@@ -1,0 +1,6 @@
+<Solution>
+  <Project Path="GastosPersonales.API/GastosPersonales.API.csproj" />
+  <Project Path="GastosPersonales.Application/GastosPersonales.Application.csproj" />
+  <Project Path="GastosPersonales.Domain/GastosPersonales.Domain.csproj" />
+  <Project Path="GastosPersonales.Infrastructure/GastosPersonales.Infrastructure.csproj" />
+</Solution>
