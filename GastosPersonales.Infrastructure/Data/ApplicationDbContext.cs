@@ -86,6 +86,33 @@ namespace GastosPersonales.Infrastructure.Data
             modelBuilder.Entity<Presupuesto>()
                 .Property(p => p.MontoLimite)
                 .HasColumnType("decimal(18,2)");
+
+            // 2. CONFIGURACIÓN DE RELACIONES Y EVITACIÓN DE CICLOS (ON DELETE RESTRICT)
+
+            modelBuilder.Entity<Gasto>()
+                .HasOne(g => g.Usuario)
+                .WithMany(u => u.Gastos)
+                .HasForeignKey(g => g.UsuarioId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<Gasto>()
+                .HasOne(g => g.MetodoPago)
+                .WithMany()
+                .HasForeignKey(g => g.MetodoPagoId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<Presupuesto>()
+                .HasOne(p => p.Usuario) 
+                 .WithMany(u => u.Presupuestos)
+                .HasForeignKey(p => p.UsuarioId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<Presupuesto>()
+                .HasOne(p => p.Categoria)
+                .WithMany()
+                .HasForeignKey(p => p.CategoriaId)
+                .OnDelete(DeleteBehavior.Restrict);
+
         }
     }
 }
