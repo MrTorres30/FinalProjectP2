@@ -4,7 +4,7 @@ using System.Text;
 
 namespace GastosPersonales.Domain.Entities
 {
-    public class Gastos
+    public class Gasto
     {
         public int Id { get; set; }
         public decimal Monto { get; set; }

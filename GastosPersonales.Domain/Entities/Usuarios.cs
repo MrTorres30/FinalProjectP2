@@ -8,7 +8,7 @@
         public string Password { get; set; } = string.Empty;
         public DateTime FechaRegistro { get; set; } = DateTime.Now;
 
-        public virtual ICollection<Gastos> Gastos { get; set; } = new List<Gastos>();
+        public virtual ICollection<Gasto> Gastos { get; set; } = new List<Gasto>();
         public virtual ICollection<Categoria> Categorias { get; set; } = new List<Categoria>();
         public virtual ICollection<MetodoPago> MetodosPago { get; set; } = new List<MetodoPago>();
         public virtual ICollection<Presupuesto> Presupuestos { get; set; } = new List<Presupuesto>();
