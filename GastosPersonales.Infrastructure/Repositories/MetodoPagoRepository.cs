@@ -17,7 +17,7 @@ namespace GastosPersonales.Infrastructure.Repositories
 
             _context = context;
         }
-        public async Task<MetodoPago?> GetByIdAsync (int id)
+        public async Task<MetodoPago?> GetByIdAsync(int id)
         {
             return await  _context.MetodosPago.FindAsync(id);
         }

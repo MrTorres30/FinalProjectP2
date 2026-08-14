@@ -7,8 +7,7 @@ namespace GastosPersonales.Domain.Repositories
 {
     public interface IMetodoPagoRepository
     {
-
-        Task<MetodoPago?> GetByIDAsync(int id);
+        Task<MetodoPago?> GetByIdAsync(int id);
         Task <IEnumerable<MetodoPago>> GetUsuarioIdAsync(int usuarioId);
         Task<MetodoPago?> GetByNombreAndUsuarioAsync(string nombre, int usuarioId);
         Task AddAsync (MetodoPago metodoPago);
