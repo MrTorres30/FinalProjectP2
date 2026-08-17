@@ -22,13 +22,13 @@ namespace GastosPersonales.Application.Services
             _tokenService = tokenService;
         }
 
-        // registrarse (CU01)
+        //  Login y registro de usuario 
         public async Task<LoginResponseDto?> RegistrarAsync(RegistroRequestDto request)
         {
             var usuarioExistente = await _usuarioRepository.GetByEmailAsync(request.Email);
             if (usuarioExistente != null)
             {
-                return null; // Correo duplicado
+                return null;
             }
 
             var passwordHash = _passwordHasher.HashPassword(request.Password);
@@ -52,7 +52,7 @@ namespace GastosPersonales.Application.Services
             };
         }
 
-        // iniciar sesión (CU02)
+        // inicio de sesión de usuario
         public async Task<LoginResponseDto?> LoginAsync(LoginRequestDto request)
         {
             var usuario = await _usuarioRepository.GetByEmailAsync(request.Email);
@@ -71,7 +71,7 @@ namespace GastosPersonales.Application.Services
             };
         }
 
-        // obtener perfil (CU03)
+        // obtener perfil 
         public async Task<PerfilUsuarioDto?> ObtenerPerfilAsync(int usuarioId)
         {
             var usuario = await _usuarioRepository.GetUsuarioAsync(usuarioId);
@@ -84,7 +84,7 @@ namespace GastosPersonales.Application.Services
             };
         }
 
-        // editar perfil (CU03)
+        // editar perfil 
         public async Task<bool> ActualizarPerfilAsync(int usuarioId, PerfilUsuarioDto request)
         {
             var usuario = await _usuarioRepository.GetUsuarioAsync(usuarioId);

@@ -8,6 +8,5 @@ namespace GastosPersonales.Application.Services
     public interface ITokenService
     {
         string GenerateToken(Usuario usuario);
-
     }
 }

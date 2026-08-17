@@ -39,7 +39,6 @@ namespace GastosPersonales.Application.Services
         }
         public async Task<MetodoPagoDto?> CrearAsync(CrearMetodoPagoDto dto, int usuarioId)
         {
-            // Validar no duplicar nombres
             var existente = await _metodoPagoRepository.GetByNombreAndUsuarioAsync(dto.Nombre, usuarioId);
             if (existente != null) return null;
             var nuevo = new MetodoPago
@@ -62,7 +61,6 @@ namespace GastosPersonales.Application.Services
         {
             var metodo = await _metodoPagoRepository.GetByIdAsync(id);
             if (metodo == null || metodo.UsuarioId != usuarioId) return false;
-            // Validar duplicado
             var existente = await _metodoPagoRepository.GetByNombreAndUsuarioAsync(dto.Nombre, usuarioId);
             if (existente != null && existente.Id != id) return false;
             metodo.Nombre = dto.Nombre;
