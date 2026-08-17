@@ -74,10 +74,8 @@ namespace GastosPersonales.Application.Services
         {
             var presupuesto = await _presupuestoRepository.GetByIdAsync(id);
             if (presupuesto == null || presupuesto.UsuarioId != usuarioId) return false;
-            // Validar que la categoría nueva exista y pertenezca al usuario
             var categoria = await _categoriaRepository.GetbyIdAsync(dto.CategoriaId);
             if (categoria == null || categoria.UsuarioId != usuarioId) return false;
-            // Validar si el nuevo mes/año/categoría choca con otro presupuesto diferente
             var existente = await _presupuestoRepository.GetByMesAndCategoriaAsync(usuarioId, dto.CategoriaId, dto.Mes, dto.Anio);
             if (existente != null && existente.Id != id) return false;
             presupuesto.MontoLimite = dto.MontoLimite;
