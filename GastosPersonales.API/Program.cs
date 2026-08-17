@@ -3,11 +3,12 @@ using GastosPersonales.Infrastructure.Data;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
-using GastosPersonales.Domain.Repositories;
+using GastosPersonales.Domain.Repositories;  
 using GastosPersonales.Infrastructure.Repositories;
 using GastosPersonales.Application.Services;
 using GastosPersonales.Infrastructure.Services;
 using Scalar.AspNetCore;
+using GastosPersonales.API.Middlewares;
 
 var builder = WebApplication.CreateBuilder(args);
 // 1. Configurar base de datos SQL Server
@@ -57,13 +58,16 @@ builder.Services.AddScoped<IExcelService, ExcelService>();
 builder.Services.AddControllers();
 builder.Services.AddOpenApi();
 var app = builder.Build();
+
+// Registra el middleware de errores global al inicio del pipeline
+app.UseMiddleware<ExceptionMiddleware>();
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi();
     app.MapScalarApiReference();
 }
-// Comentado para evitar errores SSL localmente al usar el puerto http://localhost:5056  
+// Comentado para evitar errores SSL localmente al usar el puerto http://localhost:5056  lo pongo aqui para tenerlo a mano
 // app.UseHttpsRedirection();
 app.UseAuthentication();
 app.UseAuthorization();
