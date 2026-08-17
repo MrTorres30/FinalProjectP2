@@ -38,7 +38,21 @@ namespace GastosPersonales.Application.Services
                 Nombre = request.Nombre,
                 Email = request.Email,
                 Password = passwordHash,
-                FechaRegistro = DateTime.UtcNow
+                FechaRegistro = DateTime.UtcNow,
+                Categorias = new List<Categoria>
+    {
+        new Categoria { Nombre = "Comida", Descripcion = "Alimentos, restaurantes y supermercados", EsActivo = true },
+        new Categoria { Nombre = "Transporte", Descripcion = "Combustible, pasajes y traslados", EsActivo = true },
+        new Categoria { Nombre = "Servicios", Descripcion = "Agua, luz, internet, teléfono, etc.", EsActivo = true },
+        new Categoria { Nombre = "Entretenimiento", Descripcion = "Salidas, cine, streaming y ocio", EsActivo = true },
+        new Categoria { Nombre = "Otros", Descripcion = "Gastos varios no clasificados", EsActivo = true }
+    },
+                MetodosPago = new List<MetodoPago>
+    {
+        new MetodoPago { Nombre = "Efectivo", Icono = "cash", EsActivo = true },
+        new MetodoPago { Nombre = "Tarjeta de Crédito/Débito", Icono = "credit-card", EsActivo = true },
+        new MetodoPago { Nombre = "Transferencia Bancaria", Icono = "bank", EsActivo = true }
+    }
             };
 
             await _usuarioRepository.AddAsync(nuevoUsuario);

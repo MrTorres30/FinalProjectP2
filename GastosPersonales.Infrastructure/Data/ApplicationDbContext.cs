@@ -87,7 +87,7 @@ namespace GastosPersonales.Infrastructure.Data
                 .Property(p => p.MontoLimite)
                 .HasColumnType("decimal(18,2)");
 
-            // 2. CONFIGURACIÓN DE RELACIONES Y EVITACIÓN DE CICLOS (ON DELETE RESTRICT)
+            //  CONFIGURACIÓN DE RELACIONES Y EVITACIÓN DE CICLOS 
 
             modelBuilder.Entity<Gasto>()
                 .HasOne(g => g.Usuario)
