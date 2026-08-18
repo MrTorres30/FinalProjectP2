@@ -1,10 +1,9 @@
 ﻿using GastosPersonales.Application.DTOs;
 using GastosPersonales.Application.Services;
-using MiniExcelLibs;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
-using System.Linq;
 using System.Threading.Tasks;
 namespace GastosPersonales.Infrastructure.Services
 {
@@ -12,36 +11,44 @@ namespace GastosPersonales.Infrastructure.Services
     {
         public async Task<IEnumerable<CrearGastoDto>> LeerGastosDesdeExcelAsync(Stream fileStream)
         {
-            var rows = await fileStream.QueryAsync();
             var lista = new List<CrearGastoDto>();
-            foreach (var rowObj in rows)
+            using var reader = new StreamReader(fileStream);
+            string? headerLine = await reader.ReadLineAsync();
+            if (headerLine == null) return lista;
+            char separator = headerLine.Contains(';') ? ';' : ',';
+            string? line;
+            while ((line = await reader.ReadLineAsync()) != null)
             {
-                var row = rowObj as IDictionary<string, object>;
-                if (row == null || row.Count < 3) continue;
-                string montoStr = GetValue(row, "Monto", "A");
-                string fechaStr = GetValue(row, "Fecha", "B");
-                string descStr = GetValue(row, "Descripcion", "C");
-                if (montoStr.Equals("Monto", StringComparison.OrdinalIgnoreCase)) continue;
-                if (decimal.TryParse(montoStr, out decimal monto) &&
-                    DateTime.TryParse(fechaStr, out DateTime fecha))
+                if (string.IsNullOrWhiteSpace(line)) continue;
+                var cols = line.Split(separator);
+                if (cols.Length < 3) continue;
+                decimal monto = 0;
+                DateTime fecha = DateTime.Now;
+                string descripcion = cols[2].Trim();
+                if (decimal.TryParse(cols[0].Trim().Replace('$', ' '), NumberStyles.Any, CultureInfo.InvariantCulture, out var m1))
+                {
+                    monto = m1;
+                    DateTime.TryParse(cols[1].Trim(), CultureInfo.InvariantCulture, DateTimeStyles.None, out fecha);
+                }
+                else if (DateTime.TryParse(cols[0].Trim(), CultureInfo.InvariantCulture, DateTimeStyles.None, out var f1))
+                {
+                    fecha = f1;
+                    descripcion = cols[1].Trim();
+                    decimal.TryParse(cols[2].Trim().Replace('$', ' '), NumberStyles.Any, CultureInfo.InvariantCulture, out monto);
+                }
+                if (monto > 0)
                 {
                     lista.Add(new CrearGastoDto
                     {
                         Monto = monto,
-                        Fecha = fecha,
-                        Descripcion = descStr,
-                        CategoriaId = 0, 
+                        Fecha = fecha == default ? DateTime.Now : fecha,
+                        Descripcion = descripcion,
+                        CategoriaId = 0,
                         MetodoPagoId = 0
                     });
                 }
             }
             return lista;
-        }
-        private string GetValue(IDictionary<string, object> row, string key1, string key2)
-        {
-            if (row.TryGetValue(key1, out var val1) && val1 != null) return val1.ToString() ?? "";
-            if (row.TryGetValue(key2, out var val2) && val2 != null) return val2.ToString() ?? "";
-            return "";
         }
     }
 }

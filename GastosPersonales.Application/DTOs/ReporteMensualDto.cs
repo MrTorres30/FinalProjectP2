@@ -12,7 +12,6 @@ namespace GastosPersonales.Application.DTOs
         public List<CategoriaGastoDto> DesgloseCategorias { get; set; } = new();
         public List<CategoriaGastoDto> TopCategorias { get; set; } = new();
     }
-
     public class CategoriaGastoDto
     {
         public string CategoriaNombre { get; set; } = null!;

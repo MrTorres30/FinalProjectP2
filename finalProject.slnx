@@ -1,4 +1,7 @@
 <Solution>
+  <Folder Name="/Solution Items/">
+    <File Path="README.md" />
+  </Folder>
   <Project Path="GastosPersonales.API/GastosPersonales.API.csproj" />
   <Project Path="GastosPersonales.Application/GastosPersonales.Application.csproj" />
   <Project Path="GastosPersonales.Domain/GastosPersonales.Domain.csproj" />

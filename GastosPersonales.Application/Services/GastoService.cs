@@ -83,32 +83,29 @@ namespace GastosPersonales.Application.Services
             await _gastoRepository.DeleteAsync(gasto);
             return true;
         }
-        public async Task<IEnumerable<GastoDto>> ImportarDesdeExcelAsync(Stream stream, int usuarioId)
+         public async Task<IEnumerable<GastoDto>> ImportarDesdeExcelAsync(Stream stream, int usuarioId)
         {
             var gastosImportados = await _excelService.LeerGastosDesdeExcelAsync(stream);
             var resultados = new List<GastoDto>();
-            var categorias = await _categoriaRepository.GetUsuarioIdAsync(usuarioId);
-            var metodos = await _metodoPagoRepository.GetUsuarioIdAsync(usuarioId);
+            var categorias = (await _categoriaRepository.GetUsuarioIdAsync(usuarioId)).ToList();
+            var metodos = (await _metodoPagoRepository.GetUsuarioIdAsync(usuarioId)).ToList();
+            var catDefecto = categorias.FirstOrDefault();
+            var metDefecto = metodos.FirstOrDefault();
+            if (catDefecto == null || metDefecto == null) return resultados;
             foreach (var dto in gastosImportados)
             {
-                var cat = categorias.FirstOrDefault(c => c.Nombre.Trim().Equals(dto.Descripcion, StringComparison.OrdinalIgnoreCase))
-                          ?? categorias.FirstOrDefault(); 
-                var mp = metodos.FirstOrDefault(m => m.Nombre.Trim().Equals(dto.Descripcion, StringComparison.OrdinalIgnoreCase))
-                         ?? metodos.FirstOrDefault(); 
-                if (cat == null || mp == null) continue; 
                 var nuevo = new Gasto
                 {
                     Monto = dto.Monto,
                     Fecha = dto.Fecha,
-                    Descripcion = dto.Descripcion,
-                    CategoriaId = cat.Id,
-                    MetodoPagoId = mp.Id,
+                    Descripcion = string.IsNullOrWhiteSpace(dto.Descripcion) ? "Gasto importado" : dto.Descripcion,
+                    CategoriaId = catDefecto.Id,
+                    MetodoPagoId = metDefecto.Id,
                     UsuarioId = usuarioId
                 };
                 await _gastoRepository.AddAsync(nuevo);
-
-                nuevo.Categoria = cat;
-                nuevo.MetodoPago = mp;
+                nuevo.Categoria = catDefecto;
+                nuevo.MetodoPago = metDefecto;
                 resultados.Add(MapToDto(nuevo, false));
             }
             return resultados;

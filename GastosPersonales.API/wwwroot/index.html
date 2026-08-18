@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
@@ -134,22 +134,22 @@
                     <div class="action-bar">
                         <button class="btn btn-primary" onclick="openModal('modal-gasto')"><i class="fa-solid fa-plus"></i> Registrar Gasto</button>
 
-                        <!-- Exportaciones y Carga Masiva -->
                         <div class="export-buttons">
-                            <button class="btn btn-secondary" onclick="exportarReporte('csv')">
+                            <button type="button" class="btn btn-secondary" onclick="exportarReporte('csv')">
                                 <i class="fa-solid fa-file-excel" style="color: #22c55e;"></i> Excel
                             </button>
-                            <button class="btn btn-secondary" onclick="exportarReporte('txt')">
+                            <button type="button" class="btn btn-secondary" onclick="exportarReporte('txt')">
                                 <i class="fa-solid fa-file-lines" style="color: #38bdf8;"></i> TXT
                             </button>
-                            <button class="btn btn-secondary" onclick="exportarReporte('json')">
+                            <button type="button" class="btn btn-secondary" onclick="exportarReporte('json')">
                                 <i class="fa-solid fa-code" style="color: #f59e0b;"></i> JSON
                             </button>
-                            <label class="btn btn-outline-primary" style="cursor:pointer;">
+                            <button type="button" class="btn btn-outline-primary" onclick="document.getElementById('import-csv-file').click()">
                                 <i class="fa-solid fa-file-import"></i> Importar Gastos
-                                <input type="file" id="import-csv-file" accept=".csv" style="display:none;" onchange="handleImportCsv(event)">
-                            </label>
+                            </button>
+                            <input type="file" id="import-csv-file" accept=".csv" style="display:none;" onchange="handleImportCsv(event)">
                         </div>
+                    </div>
                     <!-- Filtros -->
                     <div class="filter-card">
                         <div class="filter-group">
