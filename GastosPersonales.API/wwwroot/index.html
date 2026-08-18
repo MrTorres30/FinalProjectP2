@@ -136,15 +136,20 @@
 
                         <!-- Exportaciones y Carga Masiva -->
                         <div class="export-buttons">
-                            <button class="btn btn-secondary" onclick="exportarReporte('csv')"><i class="fa-solid fa-file-csv"></i> CSV</button>
-                            <button class="btn btn-secondary" onclick="exportarReporte('txt')"><i class="fa-solid fa-file-lines"></i> TXT</button>
-                            <button class="btn btn-secondary" onclick="exportarReporte('json')"><i class="fa-solid fa-code"></i> JSON</button>
+                            <button class="btn btn-secondary" onclick="exportarReporte('csv')">
+                                <i class="fa-solid fa-file-excel" style="color: #22c55e;"></i> Excel
+                            </button>
+                            <button class="btn btn-secondary" onclick="exportarReporte('txt')">
+                                <i class="fa-solid fa-file-lines" style="color: #38bdf8;"></i> TXT
+                            </button>
+                            <button class="btn btn-secondary" onclick="exportarReporte('json')">
+                                <i class="fa-solid fa-code" style="color: #f59e0b;"></i> JSON
+                            </button>
                             <label class="btn btn-outline-primary" style="cursor:pointer;">
-                                <i class="fa-solid fa-file-import"></i> Importar CSV
+                                <i class="fa-solid fa-file-import"></i> Importar Gastos
                                 <input type="file" id="import-csv-file" accept=".csv" style="display:none;" onchange="handleImportCsv(event)">
                             </label>
                         </div>
-                    </div>
                     <!-- Filtros -->
                     <div class="filter-card">
                         <div class="filter-group">
