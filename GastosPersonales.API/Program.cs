@@ -9,12 +9,14 @@ using GastosPersonales.Application.Services;
 using GastosPersonales.Infrastructure.Services;
 using Scalar.AspNetCore;
 using GastosPersonales.API.Middlewares;
+using GastosPersonales.Application.ExportStrategies;
+
 
 var builder = WebApplication.CreateBuilder(args);
-// 1. Configurar base de datos SQL Server
+// Configuracion de la base de datos SQL Server
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
-// 2. Configurar Autenticación con JWT Bearer
+// Configuracion de  Autenticación con JWT Bearer
 var jwtSettings = builder.Configuration.GetSection("JwtSettings");
 var keyStr = jwtSettings["Key"] ?? "ClaveSuperSecretaYMuyLarga1234567890!";
 var key = Encoding.UTF8.GetBytes(keyStr);
@@ -38,23 +40,29 @@ builder.Services.AddAuthentication(options =>
     };
 });
 builder.Services.AddAuthorization();
-// 3. Registrar Repositorios (Inyección de Dependencias)
+// Registrar Repositorios (Inyección de Dependencias)
 builder.Services.AddScoped<IUsuarioRepository, UsuarioRepository>();
 builder.Services.AddScoped<ICategoriaRepository, CategoriaRepository>();
 builder.Services.AddScoped<IMetodoPagoRepository, MetodoPagoRepository>();
 builder.Services.AddScoped<IPresupuestoRepository, PresupuestoRepository>();
 builder.Services.AddScoped<IGastoRepository, GastoRepository>();
-// 4. Registrar Servicios
+//  Registrar Servicios
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<ICategoriaService, CategoriaService>();
 builder.Services.AddScoped<IMetodoPagoService, MetodoPagoService>();
 builder.Services.AddScoped<IPresupuestoService, PresupuestoService>();
 builder.Services.AddScoped<IGastoService, GastoService>();
-// 5. Registrar Utilidades de Infraestructura
+builder.Services.AddScoped<IReporteService, ReporteService>();
+// Registro de Patrones para Exportaciones
+builder.Services.AddScoped<IExportStrategy, CsvExportStrategy>();
+builder.Services.AddScoped<IExportStrategy, TxtExportStrategy>();
+builder.Services.AddScoped<IExportStrategy, JsonExportStrategy>();
+builder.Services.AddScoped<IExportStrategyFactory, ExportStrategyFactory>();
+//  Registrar Utilidades de Infraestructura
 builder.Services.AddScoped<IPasswordHasher, PasswordHasher>();
 builder.Services.AddScoped<ITokenService, TokenService>();
 builder.Services.AddScoped<IExcelService, ExcelService>();
-// 6. Registrar controladores y OpenAPI/Scalar
+//  Registrar controladores y OpenAPI/Scalar
 builder.Services.AddControllers();
 builder.Services.AddOpenApi();
 var app = builder.Build();

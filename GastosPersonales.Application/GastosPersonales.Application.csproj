@@ -10,4 +10,8 @@
     <ProjectReference Include="..\GastosPersonales.Domain\GastosPersonales.Domain.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <PackageReference Include="MiniExcel" Version="1.45.0" />
+  </ItemGroup>
+
 </Project>
