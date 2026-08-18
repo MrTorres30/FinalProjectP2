@@ -75,6 +75,8 @@ if (app.Environment.IsDevelopment())
     app.MapOpenApi();
     app.MapScalarApiReference();
 }
+app.UseDefaultFiles(); 
+app.UseStaticFiles();
 // Comentado para evitar errores SSL localmente al usar el puerto http://localhost:5056  lo pongo aqui para tenerlo a mano
 // app.UseHttpsRedirection();
 app.UseAuthentication();

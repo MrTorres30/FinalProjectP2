@@ -1,0 +1,379 @@
+﻿<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistema de Gastos Personales</title>
+    <!-- Fuente moderna e Iconos -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Chart.js para gráficos -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <!-- ================= MODULO DE AUTENTICACION ================= -->
+    <div id="auth-section" class="auth-wrapper">
+        <div class="auth-card">
+            <div class="brand">
+                <i class="fa-solid fa-wallet"></i>
+                <h2>Gastos Personales</h2>
+            </div>
+
+            <div class="auth-tabs">
+                <button class="tab-btn active" onclick="switchAuthTab('login')">Iniciar Sesión</button>
+                <button class="tab-btn" onclick="switchAuthTab('register')">Registrarse</button>
+            </div>
+            <!-- Login Form -->
+            <form id="login-form" onsubmit="handleLogin(event)">
+                <div class="form-group">
+                    <label><i class="fa-solid fa-envelope"></i> Correo Electrónico</label>
+                    <input type="email" id="login-email" required placeholder="correo@ejemplo.com">
+                </div>
+                <div class="form-group">
+                    <label><i class="fa-solid fa-lock"></i> Contraseña</label>
+                    <input type="password" id="login-password" required placeholder="••••••••">
+                </div>
+                <button type="submit" class="btn btn-primary btn-block">Entrar al Sistema</button>
+            </form>
+            <!-- Register Form -->
+            <form id="register-form" class="hidden" onsubmit="handleRegister(event)">
+                <div class="form-group">
+                    <label><i class="fa-solid fa-user"></i> Nombre Completo</label>
+                    <input type="text" id="reg-name" required placeholder="Tu Nombre">
+                </div>
+                <div class="form-group">
+                    <label><i class="fa-solid fa-envelope"></i> Correo Electrónico</label>
+                    <input type="email" id="reg-email" required placeholder="correo@ejemplo.com">
+                </div>
+                <div class="form-group">
+                    <label><i class="fa-solid fa-lock"></i> Contraseña</label>
+                    <input type="password" id="reg-password" required placeholder="••••••••">
+                </div>
+                <button type="submit" class="btn btn-primary btn-block">Crear Cuenta</button>
+            </form>
+            <div id="auth-error" class="alert-box alert-danger hidden"></div>
+        </div>
+    </div>
+    <!-- ================= DASHBOARD / APP PRINCIPAL ================= -->
+    <div id="app-section" class="app-layout hidden">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-brand">
+                <i class="fa-solid fa-wallet"></i>
+                <span>GastosApp</span>
+            </div>
+            <nav class="sidebar-menu">
+                <a href="#" class="nav-item active" onclick="showView('dashboard')"><i class="fa-solid fa-chart-pie"></i> Dashboard</a>
+                <a href="#" class="nav-item" onclick="showView('gastos')"><i class="fa-solid fa-receipt"></i> Mis Gastos</a>
+                <a href="#" class="nav-item" onclick="showView('presupuestos')"><i class="fa-solid fa-piggy-bank"></i> Presupuestos</a>
+                <a href="#" class="nav-item" onclick="showView('categorias')"><i class="fa-solid fa-tags"></i> Categorías</a>
+                <a href="#" class="nav-item" onclick="showView('metodos')"><i class="fa-solid fa-credit-card"></i> Métodos Pago</a>
+                <a href="#" class="nav-item" onclick="showView('perfil')"><i class="fa-solid fa-user-gear"></i> Mi Perfil</a>
+            </nav>
+            <div class="sidebar-footer">
+                <button class="btn btn-outline-danger btn-block" onclick="handleLogout()"><i class="fa-solid fa-arrow-right-from-bracket"></i> Cerrar Sesión</button>
+            </div>
+        </aside>
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Topbar -->
+            <header class="topbar">
+                <h1 id="view-title">Dashboard General</h1>
+                <div class="user-info">
+                    <span id="user-display-name">Usuario</span>
+                    <div class="avatar"><i class="fa-solid fa-user"></i></div>
+                </div>
+            </header>
+            <div class="content-body">
+                <!-- 1. VISTA DASHBOARD -->
+                <section id="view-dashboard" class="view-panel active">
+                    <!-- KPI Cards -->
+                    <div class="kpi-grid">
+                        <div class="kpi-card">
+                            <div class="kpi-icon icon-blue"><i class="fa-solid fa-sack-dollar"></i></div>
+                            <div class="kpi-data">
+                                <h3>Total Gastado (Mes)</h3>
+                                <p id="kpi-total-gastado" class="kpi-value">$0.00</p>
+                            </div>
+                        </div>
+                        <div class="kpi-card">
+                            <div class="kpi-icon icon-purple"><i class="fa-solid fa-calendar-days"></i></div>
+                            <div class="kpi-data">
+                                <h3>Mes Anterior</h3>
+                                <p id="kpi-mes-anterior" class="kpi-value">$0.00</p>
+                            </div>
+                        </div>
+                        <div class="kpi-card">
+                            <div class="kpi-icon icon-green"><i class="fa-solid fa-chart-line"></i></div>
+                            <div class="kpi-data">
+                                <h3>Variación</h3>
+                                <p id="kpi-variacion" class="kpi-value">0%</p>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Gráficos y Alertas -->
+                    <div class="dashboard-grid">
+                        <div class="card chart-card">
+                            <h3><i class="fa-solid fa-chart-pie"></i> Desglose por Categoría</h3>
+                            <div class="chart-container">
+                                <canvas id="categoriesChart"></canvas>
+                            </div>
+                        </div>
+                        <div class="card budget-alerts-card">
+                            <h3><i class="fa-solid fa-bell"></i> Estado de Presupuestos (Alertas 50/80/100%)</h3>
+                            <div id="budget-alerts-list" class="budget-list">
+                                <p class="text-muted">Cargando presupuestos...</p>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+                <!-- 2. VISTA GASTOS -->
+                <section id="view-gastos" class="view-panel hidden">
+                    <div class="action-bar">
+                        <button class="btn btn-primary" onclick="openModal('modal-gasto')"><i class="fa-solid fa-plus"></i> Registrar Gasto</button>
+
+                        <!-- Exportaciones y Carga Masiva -->
+                        <div class="export-buttons">
+                            <button class="btn btn-secondary" onclick="exportarReporte('csv')"><i class="fa-solid fa-file-csv"></i> CSV</button>
+                            <button class="btn btn-secondary" onclick="exportarReporte('txt')"><i class="fa-solid fa-file-lines"></i> TXT</button>
+                            <button class="btn btn-secondary" onclick="exportarReporte('json')"><i class="fa-solid fa-code"></i> JSON</button>
+                            <label class="btn btn-outline-primary" style="cursor:pointer;">
+                                <i class="fa-solid fa-file-import"></i> Importar CSV
+                                <input type="file" id="import-csv-file" accept=".csv" style="display:none;" onchange="handleImportCsv(event)">
+                            </label>
+                        </div>
+                    </div>
+                    <!-- Filtros -->
+                    <div class="filter-card">
+                        <div class="filter-group">
+                            <label>Desde:</label>
+                            <input type="date" id="filter-inicio">
+                        </div>
+                        <div class="filter-group">
+                            <label>Hasta:</label>
+                            <input type="date" id="filter-fin">
+                        </div>
+                        <div class="filter-group">
+                            <label>Categoría:</label>
+                            <select id="filter-categoria">
+                                <option value="">Todas las categorías</option>
+                            </select>
+                        </div>
+                        <button class="btn btn-primary" onclick="loadGastos()"><i class="fa-solid fa-filter"></i> Filtrar</button>
+                    </div>
+                    <!-- Tabla de Gastos -->
+                    <div class="card table-card">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Fecha</th>
+                                    <th>Descripción</th>
+                                    <th>Categoría</th>
+                                    <th>Método Pago</th>
+                                    <th>Monto</th>
+                                    <th>Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody id="gastos-table-body">
+                                <tr><td colspan="6" class="text-center">No hay gastos registrados</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
+                <!-- 3. VISTA PRESUPUESTOS -->
+                <section id="view-presupuestos" class="view-panel hidden">
+                    <div class="action-bar">
+                        <button class="btn btn-primary" onclick="openModal('modal-presupuesto')"><i class="fa-solid fa-plus"></i> Asignar Presupuesto</button>
+                    </div>
+                    <div class="card table-card">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Categoría</th>
+                                    <th>Mes / Año</th>
+                                    <th>Límite Mensual</th>
+                                    <th>Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody id="presupuestos-table-body">
+                                <tr><td colspan="4" class="text-center">No hay presupuestos asignados</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
+                <!-- 4. VISTA CATEGORIAS -->
+                <section id="view-categorias" class="view-panel hidden">
+                    <div class="action-bar">
+                        <button class="btn btn-primary" onclick="openModal('modal-categoria')"><i class="fa-solid fa-plus"></i> Nueva Categoría</button>
+                    </div>
+                    <div class="card table-card">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Nombre</th>
+                                    <th>Descripción</th>
+                                    <th>Estado</th>
+                                    <th>Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody id="categorias-table-body">
+                                <tr><td colspan="4" class="text-center">Cargando categorías...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
+                <!-- 5. VISTA METODOS PAGO -->
+                <section id="view-metodos" class="view-panel hidden">
+                    <div class="action-bar">
+                        <button class="btn btn-primary" onclick="openModal('modal-metodo')"><i class="fa-solid fa-plus"></i> Nuevo Método de Pago</button>
+                    </div>
+                    <div class="card table-card">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Nombre</th>
+                                    <th>Ícono</th>
+                                    <th>Estado</th>
+                                    <th>Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody id="metodos-table-body">
+                                <tr><td colspan="4" class="text-center">Cargando métodos de pago...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
+                <!-- 6. VISTA PERFIL -->
+                <section id="view-perfil" class="view-panel hidden">
+                    <div class="card profile-card">
+                        <h3><i class="fa-solid fa-user-gear"></i> Modificar Mis Datos</h3>
+                        <form id="perfil-form" onsubmit="handleUpdateProfile(event)">
+                            <div class="form-group">
+                                <label>Nombre Completo:</label>
+                                <input type="text" id="perfil-nombre" required>
+                            </div>
+                            <div class="form-group">
+                                <label>Correo Electrónico (No editable):</label>
+                                <input type="email" id="perfil-email" disabled>
+                            </div>
+                            <div class="form-group">
+                                <label>Nueva Contraseña (Opcional):</label>
+                                <input type="password" id="perfil-password" placeholder="Dejar en blanco para no cambiarla">
+                            </div>
+                            <button type="submit" class="btn btn-primary">Guardar Cambios</button>
+                        </form>
+                    </div>
+                </section>
+            </div>
+        </main>
+    </div>
+    <!-- ================= MODALES ================= -->
+    <!-- Modal Gasto -->
+    <div id="modal-gasto" class="modal-backdrop hidden">
+        <div class="modal-card">
+            <h3>Registrar Nuevo Gasto</h3>
+            <form onsubmit="handleCreateGasto(event)">
+                <div class="form-group">
+                    <label>Monto ($):</label>
+                    <input type="number" step="0.01" id="gasto-monto" required min="0.01" placeholder="Ej: 25.50">
+                </div>
+                <div class="form-group">
+                    <label>Fecha:</label>
+                    <input type="date" id="gasto-fecha" required>
+                </div>
+                <div class="form-group">
+                    <label>Categoría:</label>
+                    <select id="gasto-categoria" required></select>
+                </div>
+                <div class="form-group">
+                    <label>Método de Pago:</label>
+                    <select id="gasto-metodo" required></select>
+                </div>
+                <div class="form-group">
+                    <label>Descripción:</label>
+                    <input type="text" id="gasto-desc" placeholder="Ej: Supermercado semanal">
+                </div>
+                <div class="modal-actions">
+                    <button type="button" class="btn btn-secondary" onclick="closeModal('modal-gasto')">Cancelar</button>
+                    <button type="submit" class="btn btn-primary">Guardar Gasto</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    <!-- Modal Presupuesto -->
+    <div id="modal-presupuesto" class="modal-backdrop hidden">
+        <div class="modal-card">
+            <h3>Asignar Presupuesto Mensual</h3>
+            <form onsubmit="handleCreatePresupuesto(event)">
+                <div class="form-group">
+                    <label>Categoría:</label>
+                    <select id="pres-categoria" required></select>
+                </div>
+                <div class="form-group">
+                    <label>Monto Límite ($):</label>
+                    <input type="number" step="0.01" id="pres-monto" required min="1" placeholder="Ej: 500.00">
+                </div>
+                <div class="form-row">
+                    <div class="form-group col">
+                        <label>Mes (1-12):</label>
+                        <input type="number" id="pres-mes" required min="1" max="12">
+                    </div>
+                    <div class="form-group col">
+                        <label>Año:</label>
+                        <input type="number" id="pres-anio" required min="2024">
+                    </div>
+                </div>
+                <div class="modal-actions">
+                    <button type="button" class="btn btn-secondary" onclick="closeModal('modal-presupuesto')">Cancelar</button>
+                    <button type="submit" class="btn btn-primary">Guardar Presupuesto</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    <!-- Modal Categoria -->
+    <div id="modal-categoria" class="modal-backdrop hidden">
+        <div class="modal-card">
+            <h3>Nueva Categoría</h3>
+            <form onsubmit="handleCreateCategoria(event)">
+                <div class="form-group">
+                    <label>Nombre:</label>
+                    <input type="text" id="cat-nombre" required placeholder="Ej: Educación">
+                </div>
+                <div class="form-group">
+                    <label>Descripción:</label>
+                    <input type="text" id="cat-desc" placeholder="Cursos, libros, etc.">
+                </div>
+                <div class="modal-actions">
+                    <button type="button" class="btn btn-secondary" onclick="closeModal('modal-categoria')">Cancelar</button>
+                    <button type="submit" class="btn btn-primary">Guardar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    <!-- Modal Metodo -->
+    <div id="modal-metodo" class="modal-backdrop hidden">
+        <div class="modal-card">
+            <h3>Nuevo Método de Pago</h3>
+            <form onsubmit="handleCreateMetodo(event)">
+                <div class="form-group">
+                    <label>Nombre:</label>
+                    <input type="text" id="met-nombre" required placeholder="Ej: PayPal">
+                </div>
+                <div class="form-group">
+                    <label>Ícono (opcional):</label>
+                    <input type="text" id="met-icono" placeholder="wallet, card, bank...">
+                </div>
+                <div class="modal-actions">
+                    <button type="button" class="btn btn-secondary" onclick="closeModal('modal-metodo')">Cancelar</button>
+                    <button type="submit" class="btn btn-primary">Guardar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    <!-- Toast de Notificaciones -->
+    <div id="toast" class="toast hidden"></div>
+    <script src="app.js"></script>
+</body>
+</html>
